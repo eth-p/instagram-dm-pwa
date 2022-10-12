@@ -3,7 +3,7 @@
 //
 // This hook adds dark mode support.
 // -----------------------------------------------------------------------------
-import { ComponentProps, useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 
 import type * as PolarisDarkModeQEUtils from "IG_PolarisDarkModeQEUtils";
 import type * as PolarisIGTheme from "IG_PolarisIGTheme.react";
@@ -14,14 +14,14 @@ import { useHooks } from "../react-util";
 const isSystemDark = window.matchMedia("(prefers-color-scheme: dark)");
 
 // Override the real check to whatever the user prefers.
-tryIntercept // FIXME: type error with -> <typeof PolarisIGTheme, "isDarkMode">
+tryIntercept <typeof PolarisIGTheme, "isDarkMode">
 ("PolarisIGTheme.react", "isDarkMode", (old) => {
     return isSystemDark.matches;
 });
 
 // Unconditionally enable dark mode support.
 // As of 2022-10-11, it appears to be a feature test and is not universally enabled.
-tryIntercept // FIXME: type error with -> <typeof PolarisDarkModeQEUtils, "isDarkMode">
+tryIntercept <typeof PolarisDarkModeQEUtils, "hasDarkModeToggleEnabled">
 ("PolarisDarkModeQEUtils", "hasDarkModeToggleEnabled", (old) => {
     return true;
 });
