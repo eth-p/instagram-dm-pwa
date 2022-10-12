@@ -13,6 +13,24 @@ function bootstrap(main: (define: (deps: string[], callback: Function) => void) 
 	const LOOKUP_INTERVAL   = 10;
 	const LOOKUP_TIME_LIMIT = 10000;
 
+	// Only act on the PWA.
+	//
+	// The PWA entrypoint is set to "/?utm_source=pwa_homescreen" for tracking reasons.
+	// This is convenient, since we can use that differentiate between the Instagram website and PWA.
+	// We set the window name so we can keep track of the page and know that it came from the PWA.
+
+    if (unsafeWindow.location.pathname === "/" && window.location.search === "?utm_source=pwa_homescreen") {
+        unsafeWindow.name = PROJECT_NAME;
+        unsafeWindow.history.replaceState({}, "", "/direct/t/?utm_source=pwa_homescreen");
+        unsafeWindow.location = "/direct/t/?utm_source=pwa_homescreen";
+        return;
+    }
+
+    if (window.name !== PROJECT_NAME) {
+        return;
+    }
+
+
 	// Logging utils.
 
 	window.logMsg = (format: string, ...args: any[]) => {
