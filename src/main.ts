@@ -14,5 +14,10 @@
 // ==/UserScript==
 
 import "./hooks/open-instagram-externally";
+
 import "./hooks/hide-instagram-nav";
+import "./hooks/hide-body-scrollbar";
 import "./hooks/remove-instagram-margins";
+
+import "./hooks/style-styled-scrollbar";
+import "./hooks/style-dark-mode";
