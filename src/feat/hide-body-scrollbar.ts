@@ -11,3 +11,9 @@ stylesheet(`
         overflow-y: hidden !important;
 	}
 `);
+
+document.documentElement.style.setProperty(
+	"overflow-y",
+	"hidden",
+	"important"
+);
