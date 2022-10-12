@@ -15,14 +15,14 @@ const isSystemDark = window.matchMedia("(prefers-color-scheme: dark)");
 
 // Override the real check to whatever the user prefers.
 tryIntercept <typeof PolarisIGTheme, "isDarkMode">
-("PolarisIGTheme.react", "isDarkMode", (old) => {
+("PolarisIGTheme.react", "isDarkMode", (_thisArg, _original, _args) => {
     return isSystemDark.matches;
 });
 
 // Unconditionally enable dark mode support.
 // As of 2022-10-11, it appears to be a feature test and is not universally enabled.
 tryIntercept <typeof PolarisDarkModeQEUtils, "hasDarkModeToggleEnabled">
-("PolarisDarkModeQEUtils", "hasDarkModeToggleEnabled", (old) => {
+("PolarisDarkModeQEUtils", "hasDarkModeToggleEnabled", (_thisArg, _original, _args) => {
     return true;
 });
 
