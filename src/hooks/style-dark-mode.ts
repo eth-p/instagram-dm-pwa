@@ -5,46 +5,51 @@
 // -----------------------------------------------------------------------------
 import { ComponentProps, useContext, useEffect, useState } from "react";
 
-import * as PolarisIGTheme from "IG_PolarisIGTheme.react";
-import * as PolarisDarkModeQEUtils from "IG_PolarisDarkModeQEUtils";
+import type * as PolarisDarkModeQEUtils from "IG_PolarisDarkModeQEUtils";
+import type * as PolarisIGTheme from "IG_PolarisIGTheme.react";
 
-import { intercept } from "../interceptor";
+import { tryIntercept, tryModules } from "../modules";
 import { useHooks } from "../react-util";
 
 const isSystemDark = window.matchMedia("(prefers-color-scheme: dark)");
 
 // Override the real check to whatever the user prefers.
-intercept(PolarisIGTheme as any /* FIXME: type error */, "isDarkMode", (old) => {
+tryIntercept // FIXME: type error with -> <typeof PolarisIGTheme, "isDarkMode">
+("PolarisIGTheme.react", "isDarkMode", (old) => {
     return isSystemDark.matches;
 });
 
 // Unconditionally enable dark mode support.
 // As of 2022-10-11, it appears to be a feature test and is not universally enabled.
-intercept(PolarisDarkModeQEUtils as any /* FIXME: type error */, "hasDarkModeToggleEnabled", (old) => {
+tryIntercept // FIXME: type error with -> <typeof PolarisDarkModeQEUtils, "isDarkMode">
+("PolarisDarkModeQEUtils", "hasDarkModeToggleEnabled", (old) => {
     return true;
 });
 
 // Within the context of the React app, update the theme.
 // Also listen for color scheme changes and update dynamically.
-useHooks(() => {
-    const ctx = useContext(PolarisIGTheme.IGThemeContext) as any;
-    function onSystemColorSchemeChange() {
-        ctx.setTheme(isSystemDark.matches ? PolarisIGTheme.IGTheme.Dark : PolarisIGTheme.IGTheme.Light);
-    }
-
-    useState(() => {
-        isSystemDark.addEventListener('change', onSystemColorSchemeChange);
-        onSystemColorSchemeChange();
-
-        return () => {
-            isSystemDark.removeEventListener('change', onSystemColorSchemeChange);
+tryModules<[typeof PolarisIGTheme]>
+(["IG_PolarisIGTheme.react"], (PolarisIGTheme) => {
+    useHooks(() => {
+        const ctx = useContext(PolarisIGTheme.IGThemeContext) as any;
+        function onSystemColorSchemeChange() {
+            ctx.setTheme(isSystemDark.matches ? PolarisIGTheme.IGTheme.Dark : PolarisIGTheme.IGTheme.Light);
         }
+
+        useState(() => {
+            isSystemDark.addEventListener('change', onSystemColorSchemeChange);
+            onSystemColorSchemeChange();
+
+            return () => {
+                isSystemDark.removeEventListener('change', onSystemColorSchemeChange);
+            }
+        });
     });
-})
+});
 
 // Listen for the theme to change.
 // When it changes, update the <meta name="theme-color"> tag.
-const styleObserver = new MutationObserver((mutations) => {
+const styleObserver = new MutationObserver((_mutations) => {
     const style = window.getComputedStyle(document.body);
     const background = (() => {
         const varBg = style.getPropertyValue("--ig-background");

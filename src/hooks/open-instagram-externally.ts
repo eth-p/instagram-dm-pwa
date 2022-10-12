@@ -5,13 +5,13 @@
 // navigation) to open non-DM Instagram links in a new tab, preventing the page
 // from leaving the Instagram DM view.
 // -----------------------------------------------------------------------------
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
 
-import * as FastLink from "IG_FastLink";
+import type * as FastLink from "IG_FastLink";
 
-import { reexport } from "../interceptor";
+import { tryReexport } from "../modules";
 
-reexport("FastLink", FastLink, (old) => {
+tryReexport<typeof FastLink>("FastLink", (old) => {
 	return (props: ComponentProps<typeof FastLink.default>) => {
 		if (props.href != null && !props.href.startsWith("/direct/")) {
 			props.target = "_blank";

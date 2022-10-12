@@ -1,7 +1,7 @@
 import * as PolarisDirectShell_dot_next from "IG_PolarisDirectShell.next";
 import { ComponentProps, useState } from "react";
 
-import { reexport } from "./interceptor";
+import { reexport } from "./modules";
 
 let hooks: (() => void)[] = [];
 let refresh: {do: () => void} = {do: () => {}};
