@@ -17,6 +17,5 @@ declare module "IG_FastLink" {
 		shouldOpenModal?: boolean;
 		state?: unknown;
 		style_DEPRECATED?: unknown;
-	}): any {
-	}
+	}): React.ReactElement;
 }

@@ -17,6 +17,5 @@ declare module "IG_PolarisIGCoreSVGIcon" {
 		className?: string;
 		size?: unknown;
 		shadow?: unknown;
-	}): any {
-	}
+	}): React.ReactElement;
 }

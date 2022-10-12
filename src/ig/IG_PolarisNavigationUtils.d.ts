@@ -1,17 +1,14 @@
 declare module "IG_PolarisNavigationUtils" {
 
-	function openExternalURL(a, b, c, d, e, f) {
-	}
+	export function openExternalURL(a, b, c, d, e, f);
 
 	/**
 	 * Used to navigate in-app.
 	 * @param a
 	 * @param b
 	 */
-	function openURLWithFullPageReload(a, b) {
-	}
+	export function openURLWithFullPageReload(a, b);
 
-	function redirectToNextParam() {
-	}
+	export function redirectToNextParam();
 
 }

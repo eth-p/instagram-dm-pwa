@@ -3,6 +3,5 @@ declare module "IG_PolarisDesktopDirectPage.react" {
 		activeFolder?: unknown;
 		threadId: string;
 		view: "thread" | unknown;
-	}): React.ReactElement {
-	}
+	}): React.ReactElement;
 }

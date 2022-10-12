@@ -6,22 +6,22 @@ declare module "IG_PolarisIGTheme.react" {
 	export enum IGTheme {
 		Light = "light",
 		Dark = "dark"
-	};
+	}
 
 	/**
 	 * Returns true if Instagram is using the dark theme.
 	 */
-	export const isDarkMode: () => boolean;
+	export function isDarkMode(): boolean;
 
 	/**
 	 * A React hook for using the theme in a functional component.
 	 */
-	export const useTheme: () => unknown;
+	export function useTheme(): unknown;
 
 	/**
 	 * A React hook for using the theme in a functional component.
 	 */
-	export const useThemeColor: (a: unknown) => unknown;
+	export function useThemeColor(a: unknown): unknown;
 
 	// Unknown
 

@@ -29,6 +29,5 @@ declare module "IG_PolarisIGCoreBox" {
 		left?: boolean;
 		right?: boolean;
 		top?: boolean;
-	}): any {
-	}
+	}): React.ReactElement;
 }
