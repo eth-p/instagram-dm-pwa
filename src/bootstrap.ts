@@ -47,22 +47,14 @@ function bootstrap(main: (define: (deps: string[], callback: Function) => void) 
 	// work correctly with rollup's AMD modules. We also need to force a
 	// lazy load on the module to have it actually start loading.
 	function defineShim(deps: string[], callback: Function) {
-		const name = "userscript!github.com/eth-p/instagram-dm-pwa";
 		const nsprefix = /^IG_/;
-
-		// Define the module.
-		unsafeWindow.define(name, deps.map(d => d.replace(nsprefix, "")), (...args: any[]) => {
+		unsafeWindow.requireLazy(deps.map(d => d.replace(nsprefix, "")), (...args: any[]) => {
 			try {
 				return callback(...args);
 			} catch (ex) {
 				window.logErr("Unexpected error.", ex);
 				throw ex;
 			}
-		});
-
-		// Load the module and its dependencies.
-		unsafeWindow.requireLazy([name], () => {
-			window.logMsg("Bootstrap successful.");
 		});
 	}
 
