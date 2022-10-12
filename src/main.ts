@@ -7,6 +7,8 @@
 // @match        https://www.instagram.com/direct/*
 // @match        https://www.instagram.com/?utm_source=pwa_homescreen
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=instagram.com
+// @updateURL    ${ PROJECT.repository }/releases/latest/download/${ PROJECT.name }.user.js
+// @downloadURL  ${ PROJECT.repository }/releases/latest/download/${ PROJECT.name }.user.js
 // @grant        GM.getValue
 // @grant        GM.setValue
 // @grant        unsafeWindow

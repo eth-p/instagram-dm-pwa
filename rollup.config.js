@@ -123,9 +123,11 @@ const external = [
 
 // Replacement variables.
 const replacements = {
+	"PROJECT.name": project.name,
 	"PROJECT.version": project.version,
 	"PROJECT.author": project.author,
 	"PROJECT.description": project.description,
+	"PROJECT.repository": project.repository.url.replace(/^git\+/, "").replace(/\.git$/, ""),
 }
 
 // Config.
