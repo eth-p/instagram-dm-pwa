@@ -1,0 +1,35 @@
+{
+	"include": ["./src/**/*.ts"],
+	"exclude": ["./src/bootstrap.ts"],
+	"compilerOptions": {
+		"moduleResolution": "Node",
+		"module": "ESNext",
+		"sourceMap": true,
+		"lib": ["DOM", "DOM.Iterable", "ES2021"],
+		"types": ["tampermonkey"],
+		"typeRoots": [
+			"./src/ig",
+		],
+
+		// Hacky things needed
+		"allowSyntheticDefaultImports": true,
+
+		// React
+		"jsx": "react",
+		"jsxFactory": "React.createElement",
+		"jsxFragmentFactory": "React.Fragment",
+
+		// Performance
+		"skipLibCheck": true,
+		"noEmit": true,
+
+		// Modern JS
+		"target": "ES2021",
+		"downlevelIteration": false,
+		"importHelpers": false,
+		"noEmitHelpers": true,
+
+		// Safety
+		"strict": true
+	}
+}

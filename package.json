@@ -1,0 +1,35 @@
+{
+  "name": "instagram-dm-pwa",
+  "version": "0.3.0",
+  "description": "Convert the Instagram PWA into a fully functional chat application.",
+  "main": "dist/instagram-dm-pwa.user.js",
+  "scripts": {
+    "build": "rollup -c",
+    "start": "rollup -c --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eth-p/instagram-dm-pwa.git"
+  },
+  "author": "eth-p",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/eth-p/instagram-dm-pwa/issues"
+  },
+  "homepage": "https://github.com/eth-p/instagram-dm-pwa#readme",
+  "devDependencies": {
+    "@rollup/plugin-replace": "^5.0.0",
+    "@rollup/plugin-typescript": "^9.0.1",
+    "@types/react": "^18.0.21",
+    "@types/tampermonkey": "^4.0.5",
+    "eslint": "^8.25.0",
+    "open": "^8.4.0",
+    "prettier": "^2.7.1",
+    "rollup-plugin-esbuild": "^4.10.1",
+    "rollup-plugin-insert": "^1.3.2",
+    "rollup-plugin-prettier": "^2.2.2",
+    "rollup-plugin-watch-globs": "^1.0.0",
+    "typescript": "^4.8.4"
+  }
+}
