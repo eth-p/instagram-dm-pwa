@@ -1,17 +1,17 @@
 import {modulesMap} from "__debug";
 
 declare interface Window {
-	requireLazy: (deps: string[], callback: Function) => unknown;
+	requireLazy: (deps: string[], callback: (...args: any[]) => any) => unknown;
 }
 
-type FunctionsIn<T extends {}> = {
-	[key in keyof T]: T[key] extends (...args: any[]) => infer R ? T[key] : never;
+type FunctionsIn<T> = {
+	[key in keyof T]: T[key] extends (...args: any[]) => any ? T[key] : never;
 };
 
 /**
  * Canonicalizes a module name.
  * This strips the fake "IG_" prefixes we use for namespacing.
- * 
+ *
  * @param name The module name.
  * @returns The canon module name.
  */
@@ -24,11 +24,11 @@ function canonicalize(name: string) {
 /**
  * Attempts to load the named modules.
  * If and when they are available, the callback will be called.
- * 
- * @param names The module names. 
+ *
+ * @param names The module names.
  * @param callback The callback.
  */
- export function tryModules<T extends Array<any>>(names: string[], callback: (...modules: T) => void) {
+export function tryModules<T extends Array<any>>(names: string[], callback: (...modules: T) => void) {
 	const window = (unsafeWindow as unknown as Window);
 	window.requireLazy(names.map(canonicalize), callback);
 
@@ -46,7 +46,8 @@ function canonicalize(name: string) {
  *     return func.apply(self, args);
  * });
  */
-export function wrap<T extends (...args: A) => R, A extends any[], R>
+export function wrap
+<T extends (...args: A) => R, A extends any[], R>
 (func: T, wrapper: (thisValue: ThisType<T>, original: T, args: Parameters<T>) => R): T {
 	const original = func;
 	return function(this: ThisType<T>, ...args: Parameters<T>): R {
@@ -57,7 +58,7 @@ export function wrap<T extends (...args: A) => R, A extends any[], R>
 /**
  * Attempts to intercept a module export.
  *
- * @param module The module.
+ * @param name The module name.
  * @param prop The function to overwrite.
  * @param wrapper The wrapping function.
  *
@@ -66,9 +67,10 @@ export function wrap<T extends (...args: A) => R, A extends any[], R>
  *     return func.apply(self, args);
  * });
  */
-export function tryIntercept<M extends {[key: string]: (...args: any[]) => any}, P extends keyof FunctionsIn<M>>
-(name: string, prop: P, wrapper: (thisValue: ThisType<M[P]>, original: M[P], args: Parameters<M[P]>) => ReturnType<M[P]>) {
-	tryModules<[M]>([name], (mod: M) => {
+export function tryIntercept
+<Module extends any, Prop extends keyof FunctionsIn<MF>, MF extends FunctionsIn<Module> = FunctionsIn<Module>>
+(name: string, prop: Prop, wrapper: (thisValue: ThisType<MF[Prop]>, original: MF[Prop], args: Parameters<MF[Prop]>) => ReturnType<MF[Prop]>) {
+	tryModules<[Module, Prop, MF]>([name], (mod: Module) => {
 		intercept(mod, prop, wrapper);
 	});
 }
@@ -85,20 +87,20 @@ export function tryIntercept<M extends {[key: string]: (...args: any[]) => any},
  *     return func.apply(self, args);
  * });
  */
-export function intercept<M extends {[key: string]: (...args: any[]) => any}, P extends keyof FunctionsIn<M>>
-(module: M, prop: P, wrapper: (thisValue: ThisType<M[P]>, original: M[P], args: Parameters<M[P]>) => ReturnType<M[P]>) {
-	const original = module[prop];
-	module[prop] = function(this: ThisType<M[P]>, ...args: Parameters<M[P]>): ReturnType<M[P]> {
-		return wrapper(this, original, args);
-	} as M[P];
+export function intercept
+<Module extends any, Prop extends keyof FunctionsIn<MF>, MF extends FunctionsIn<Module> = FunctionsIn<Module>>
+(module: Module, prop: Prop, wrapper: (thisValue: ThisType<MF[Prop]>, original: MF[Prop], args: Parameters<MF[Prop]>) => ReturnType<MF[Prop]>) {
+	const original = (module as unknown as MF)[prop];
+	(module as unknown as MF)[prop] = function(this: ThisType<MF[Prop]>, ...args: Parameters<MF[Prop]>): ReturnType<MF[Prop]> {
+		return wrapper(this, original as unknown as MF[Prop], args);
+	} as MF[Prop];
 }
 
 /**
  * Attempts to re-exports a new set of values from a module.
  * If the module cannot be loaded, nothing will happen.
  *
- * @param moduleName The name of the module to re-export.
- * @param module The module itself.
+ * @param name The name of the module to re-export.
  * @param factory Generates new exports.
  *
  * @example
@@ -126,7 +128,8 @@ export function tryReexport<M>(name: string, factory: (exports: M) => any) {
  *     return original;
  * });
  */
-export function reexport<M>(name: string, module: M, factory: (exports: M) => any) {
+export function reexport<M>
+(name: string, module: M, factory: (exports: M) => any) {
 	const moduleNameReal = canonicalize(name);
 
 	const internals = modulesMap[moduleNameReal];
