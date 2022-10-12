@@ -13,11 +13,11 @@
 // @run-at       document-start
 // ==/UserScript==
 
-import "./hooks/open-instagram-externally";
+import "./feat/open-instagram-externally";
 
-import "./hooks/hide-instagram-nav";
-import "./hooks/hide-body-scrollbar";
-import "./hooks/remove-instagram-margins";
+import "./feat/hide-instagram-nav";
+import "./feat/hide-body-scrollbar";
+import "./feat/remove-instagram-margins";
 
-import "./hooks/style-styled-scrollbar";
-import "./hooks/style-dark-mode";
+import "./feat/style-styled-scrollbar";
+import "./feat/style-dark-mode";
