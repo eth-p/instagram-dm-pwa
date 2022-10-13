@@ -26,6 +26,7 @@ tryModules([target], mod => {
 		body {
 			--nav-medium-width: 0px;
 			--nav-narrow-width: 0px;
+			--nav-wide-width: 0px;
 		}
 	`);
 });
