@@ -2,6 +2,7 @@ import {modulesMap} from "__debug";
 
 declare interface Window {
 	requireLazy: (deps: string[], callback: (...args: any[]) => any) => unknown;
+	require: (dep: string) => unknown;
 }
 
 type FunctionsIn<T> = {
@@ -132,7 +133,13 @@ export function reexport<M>
 (name: string, module: M, factory: (exports: M) => any) {
 	const moduleNameReal = canonicalize(name);
 
+	// Get the module, forcing it to evaluate if not done yet.
 	const internals = modulesMap[moduleNameReal];
+	if (!internals.factoryFinished) {
+		(unsafeWindow as unknown as Window).require(moduleNameReal);
+	}
+
+	// Get the original exports and rewrite them.
 	const originals = internals.exports;
 	const rewritten = factory(originals);
 	internals.defaultExport = rewritten;
