@@ -1,6 +1,6 @@
 {
   "name": "instagram-dm-pwa",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Convert the Instagram PWA into a fully functional chat application.",
   "main": "dist/instagram-dm-pwa.user.js",
   "scripts": {
