@@ -66,9 +66,12 @@ function bootstrap(main: (define: (deps: string[], callback: Function) => void) 
 	// lazy load on the module to have it actually start loading.
 	function defineShim(deps: string[], callback: Function) {
 		const nsprefix = /^IG_/;
-		unsafeWindow.requireLazy(deps.map(d => d.replace(nsprefix, "")), (...args: any[]) => {
+		const canonicalDeps = deps.map(d => d.replace(nsprefix, ""));
+		window.logMsg("Required modules:", canonicalDeps);
+		unsafeWindow.requireLazy(canonicalDeps, (...args: any[]) => {
 			try {
-				return callback(...args);
+				callback(...args);
+				window.logMsg("Bootstrap complete after %s seconds.", (Date.now() - start) / 1000);
 			} catch (ex) {
 				window.logErr("Unexpected error.", ex);
 				throw ex;
