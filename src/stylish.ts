@@ -5,6 +5,6 @@
  */
 export function stylesheet(styles: string) {
 	const element = document.createElement("style");
-	element.innerHTML = styles;
+	element.textContent = styles;
 	document.head.appendChild(element);
 }
