@@ -1,7 +1,9 @@
 import {modulesMap} from "__debug";
 
+import {error,} from "./debug";
+
 declare interface Window {
-	requireLazy: (deps: string[], callback: (...args: any[]) => any) => unknown;
+	requireLazy: (deps: string[], callback: (...args: any[]) => any) => {cancel: () => void};
 	require: (dep: string) => unknown;
 }
 
@@ -21,19 +23,103 @@ function canonicalize(name: string) {
 }
 
 
+type LoadManagerEntry = {cancel: null | (() => void), done: (() => void)};
+
+/**
+ * A utility class to track module loading and timeouts.
+ */
+export class LoadManager {
+	private readonly name: string;
+	private readonly requested: Set<string>;
+	private readonly pendingMap: Map<string, LoadManagerEntry>;
+	private timerId: number|null;
+
+	public timeout: number;
+
+	public constructor(name: string, onTimeout?: (this: LoadManager) => void) {
+		this.name = name;
+		this.requested = new Set();
+		this.pendingMap = new Map();
+		this.timerId = null;
+
+		this.timeout = 10_000;
+		this.onTimeout = onTimeout ?? this.onTimeout;
+	}
+
+	protected restartTimer() {
+		if (this.timerId != null) {
+			clearTimeout(this.timerId);
+		}
+
+		this.timerId = setTimeout(this.onTimeout.bind(this), this.timeout);
+	}
+
+	protected onTimeout() {
+		error("%s: timed out loading modules", this.name, this.pending);
+	}
+
+	protected waitingDone(name: string): void {
+		this.pendingMap.delete(name);
+		if (this.pendingMap.size === 0 && this.timerId != null) {
+			clearTimeout(this.timerId);
+		}
+	}
+
+	protected waitingFor(name: string): LoadManagerEntry {
+		const entry = {cancel: null, done: this.waitingDone.bind(this, name)};
+		this.requested.add(name);
+		this.pendingMap.set(name, entry);
+		this.restartTimer();
+		return entry;
+	}
+
+	/**
+	 * The modules still waiting to be loaded.
+	 */
+	public get pending(): string[] {
+		return Array.from(this.pendingMap.keys());
+	}
+
+	/**
+	 * Stops the timer tracking when modules fail to load.
+	 */
+	public stopTimer(): void {
+		if (this.timerId != null) {
+			clearTimeout(this.timerId);
+		}
+	}
+}
 
 /**
  * Attempts to load the named modules.
  * If and when they are available, the callback will be called.
  *
+ * @param manager The load manager, may be null.
  * @param names The module names.
  * @param callback The callback.
  */
-export function tryModules<T extends Array<any>>(names: string[], callback: (...modules: T) => void) {
+export function tryModules<T extends Array<any>>(manager: LoadManager|null, names: string[], callback: (...modules: T) => void) {
 	const window = (unsafeWindow as unknown as Window);
-	window.requireLazy(names.map(canonicalize), callback);
+	const moduleIds = names.map(canonicalize);
 
-	// TODO: Error/timeout handling.
+	const promises: {[key in keyof T]: Promise<T[key]>} = moduleIds.map(id => new Promise((resolve, reject) => {
+		const waiter = (manager as LoadManager & {waitingFor: LoadManager['waitingFor']})?.waitingFor(id);
+		
+		// Ask the Instagram module loader for the modules.
+		const {cancel} = window.requireLazy([id], (module) => {
+			if (waiter != null) {
+				waiter.done();
+			}
+
+			resolve(module);
+		});
+
+		waiter.cancel = cancel;
+	})) as any;
+
+	Promise.all(promises).then((modules: T) => {
+		callback(...modules);
+	})
 }
 
 /**
@@ -59,6 +145,7 @@ export function wrap
 /**
  * Attempts to intercept a module export.
  *
+ * @param manager The load manager, may be null.
  * @param name The module name.
  * @param prop The function to overwrite.
  * @param wrapper The wrapping function.
@@ -70,8 +157,8 @@ export function wrap
  */
 export function tryIntercept
 <Module extends any, Prop extends keyof FunctionsIn<MF>, MF extends FunctionsIn<Module> = FunctionsIn<Module>>
-(name: string, prop: Prop, wrapper: (thisValue: ThisType<MF[Prop]>, original: MF[Prop], args: Parameters<MF[Prop]>) => ReturnType<MF[Prop]>) {
-	tryModules<[Module, Prop, MF]>([name], (mod: Module) => {
+(manager: LoadManager|null, name: string, prop: Prop, wrapper: (thisValue: ThisType<MF[Prop]>, original: MF[Prop], args: Parameters<MF[Prop]>) => ReturnType<MF[Prop]>) {
+	tryModules<[Module, Prop, MF]>(manager, [name], (mod: Module) => {
 		intercept(mod, prop, wrapper);
 	});
 }
@@ -101,6 +188,7 @@ export function intercept
  * Attempts to re-exports a new set of values from a module.
  * If the module cannot be loaded, nothing will happen.
  *
+ * @param manager The load manager, may be null.
  * @param name The name of the module to re-export.
  * @param factory Generates new exports.
  *
@@ -110,8 +198,8 @@ export function intercept
  *     return original;
  * });
  */
-export function tryReexport<M>(name: string, factory: (exports: M) => any) {
-	tryModules<[M]>([name], (mod: M) => {
+export function tryReexport<M>(manager: LoadManager|null, name: string, factory: (exports: M) => any) {
+	tryModules<[M]>(manager, [name], (mod: M) => {
 		reexport(name, mod, factory);
 	});
 }

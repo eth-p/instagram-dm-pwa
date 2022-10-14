@@ -8,28 +8,29 @@ import { useContext, useState } from "react";
 import type * as PolarisDarkModeQEUtils from "IG_PolarisDarkModeQEUtils";
 import type * as PolarisIGTheme from "IG_PolarisIGTheme.react";
 
-import { tryIntercept, tryModules } from "../modules";
+import { LoadManager, tryIntercept, tryModules } from "../modules";
 import { useHooks } from "../react-util";
 
 const isSystemDark = window.matchMedia("(prefers-color-scheme: dark)");
+const manager = new LoadManager("hide-instagram-nav");
 
 // Override the real check to whatever the user prefers.
 tryIntercept <typeof PolarisIGTheme, "isDarkMode">
-("PolarisIGTheme.react", "isDarkMode", (_thisArg, _original, _args) => {
+(manager, "PolarisIGTheme.react", "isDarkMode", (_thisArg, _original, _args) => {
     return isSystemDark.matches;
 });
 
 // Unconditionally enable dark mode support.
 // As of 2022-10-11, it appears to be a feature test and is not universally enabled.
 tryIntercept <typeof PolarisDarkModeQEUtils, "hasDarkModeToggleEnabled">
-("PolarisDarkModeQEUtils", "hasDarkModeToggleEnabled", (_thisArg, _original, _args) => {
+(manager, "PolarisDarkModeQEUtils", "hasDarkModeToggleEnabled", (_thisArg, _original, _args) => {
     return true;
 });
 
 // Within the context of the React app, update the theme.
 // Also listen for color scheme changes and update dynamically.
 tryModules<[typeof PolarisIGTheme]>
-(["IG_PolarisIGTheme.react"], (PolarisIGTheme) => {
+(manager, ["IG_PolarisIGTheme.react"], (PolarisIGTheme) => {
     useHooks(() => {
         const ctx = useContext(PolarisIGTheme.IGThemeContext) as any;
         function onSystemColorSchemeChange() {

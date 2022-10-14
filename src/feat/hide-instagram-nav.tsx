@@ -9,13 +9,16 @@ import * as React from "react";
 import type * as PolarisNavigation_dot_React from "IG_PolarisNavigation.react";
 import type * as PolarisDesktopNav_dot_react from "IG_PolarisDesktopNav.react";
 
-import { tryModules, reexport } from "../modules";
+import { tryModules, reexport, LoadManager } from "../modules";
 import { stylesheet } from "../stylish";
 import { createRef, useEffect, useRef } from "react";
 
 // New Site
+const manager = new LoadManager("hide-instagram-nav");
 const target = "PolarisNavigation.react";
-tryModules([target], mod => {
+tryModules(manager, [target], mod => {
+	manager.stopTimer();
+
 	reexport(target, mod, (old) => {
 		return (props: ComponentProps<typeof PolarisNavigation_dot_React.default>) => {
 			return <></>;
@@ -33,7 +36,9 @@ tryModules([target], mod => {
 
 // Old Site
 const targetOld = "PolarisDesktopNav.react";
-tryModules([targetOld], mod => {
+tryModules(manager, [targetOld], mod => {
+	manager.stopTimer();
+	
 	reexport(targetOld, mod, (old) => {
 		return (props: ComponentProps<typeof PolarisDesktopNav_dot_react.default>) => {
 			const ref = createRef<HTMLDivElement>();

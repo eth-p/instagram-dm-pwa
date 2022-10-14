@@ -10,7 +10,7 @@ import type { ComponentProps } from "react";
 import type * as FastLink from "IG_FastLink";
 import type * as browserHistory from "IG_browserHistory";
 
-import { intercept, tryModules, tryReexport, wrap } from "../modules";
+import { intercept, LoadManager, tryModules, tryReexport, wrap } from "../modules";
 
 /**
  * Checks if a URL should open externally.
@@ -35,7 +35,9 @@ function tryOpenExternally(url: string): boolean {
 	return false;
 }
 
-tryReexport<typeof FastLink>("FastLink", (old) => {
+
+const manager = new LoadManager("hide-instagram-nav");
+tryReexport<typeof FastLink>(manager, "FastLink", (old) => {
 	return (props: ComponentProps<typeof FastLink.default>) => {
 		if (shouldOpenExternally(props.href)) {
 			props.target = "_blank";
@@ -48,7 +50,7 @@ tryReexport<typeof FastLink>("FastLink", (old) => {
 });
 
 tryModules<[typeof browserHistory]>
-(["browserHistory"], (browserHistory) => {
+(manager, ["browserHistory"], (browserHistory) => {
 
 	intercept(browserHistory, "redirect", (thisValue, original, args) => {
 		if (!tryOpenExternally(args[0])) {

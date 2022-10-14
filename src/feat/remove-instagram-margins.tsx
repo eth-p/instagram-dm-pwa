@@ -8,11 +8,12 @@ import type { ComponentProps } from "react";
 import type * as PolarisDesktopDirectPage from "IG_PolarisDesktopDirectPage.react";
 import type PolarisIGCoreBox from "IG_PolarisIGCoreBox";
 
-import { tryModules, reexport } from "../modules";
+import { tryModules, reexport, LoadManager } from "../modules";
 import { visit } from "../react-util";
 
+const manager = new LoadManager("hide-instagram-nav");
 tryModules<[typeof PolarisDesktopDirectPage, typeof PolarisIGCoreBox]>
-(["PolarisDesktopDirectPage.react", "PolarisIGCoreBox"], (PolarisDesktopDirectPage, PolarisIGCoreBox) => {
+(manager, ["PolarisDesktopDirectPage.react", "PolarisIGCoreBox"], (PolarisDesktopDirectPage, PolarisIGCoreBox) => {
 	reexport("PolarisDesktopDirectPage.react", PolarisDesktopDirectPage, (old) => {
 		return (props: ComponentProps<typeof PolarisDesktopDirectPage.default>) => {
 			const root = old.default(props);
@@ -30,7 +31,7 @@ tryModules<[typeof PolarisDesktopDirectPage, typeof PolarisIGCoreBox]>
 
 				return visit(element);
 			});
-			
+
 		};
 	});
 })
