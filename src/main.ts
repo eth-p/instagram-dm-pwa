@@ -15,6 +15,8 @@
 // @run-at       document-start
 // ==/UserScript==
 
+import "./ui/init";
+
 import "./feat/open-instagram-externally";
 import "./feat/improved-title";
 
