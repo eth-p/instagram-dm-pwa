@@ -16,9 +16,9 @@ const manager = new LoadManager("improved-title");
 let currentThread = "";
 
 // Override the chat thread header to steal the title.
-tryReexport<typeof PolarissetPageTitle>
+tryReexport<typeof PolarisDirectThreadViewHeader_dot_react>
 (manager, "IG_PolarisDirectThreadViewHeader.react", (old) => {
-	return (props: ComponentProps<PolarisDirectThreadViewHeader_dot_react["default"]>) => {
+	return (props: ComponentProps<typeof PolarisDirectThreadViewHeader_dot_react["default"]>) => {
 		currentThread = props.title;
 		return old.default(props);
 	};
