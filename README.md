@@ -9,6 +9,7 @@ A UserScript for turning the Instagram PWA into a real chat application.
 * Hide the unnecessary scrollbar.
 * Remove instagram margins.
 * Styled scrollbars in Chrome/Edge.
+* Reworked title that shows the current chat name.
 
 ## Installation
 

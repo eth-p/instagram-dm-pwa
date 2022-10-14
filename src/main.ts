@@ -16,6 +16,7 @@
 // ==/UserScript==
 
 import "./feat/open-instagram-externally";
+import "./feat/improved-title";
 
 import "./feat/hide-body-scrollbar";
 import "./feat/remove-instagram-margins";
