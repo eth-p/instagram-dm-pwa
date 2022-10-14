@@ -137,7 +137,6 @@ export default {
 	output: {
 		file: `dist/${project.name}.user.js`,
 		format: "amd",
-		sourcemap: process.env.NODE_ENV === "production" ? "hidden" : "inline",
 
 		// Keep the code as readable as possible.
 		interop: false,
