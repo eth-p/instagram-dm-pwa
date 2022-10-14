@@ -17,9 +17,10 @@
 
 import "./feat/open-instagram-externally";
 
-import "./feat/hide-instagram-nav";
 import "./feat/hide-body-scrollbar";
 import "./feat/remove-instagram-margins";
+import "./feat/remove-nav-v2";
+import "./feat/remove-nav-v1";
 
 import "./feat/style-styled-scrollbar";
 import "./feat/style-dark-mode";
