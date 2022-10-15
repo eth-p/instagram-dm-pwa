@@ -1,0 +1,22 @@
+{
+	"name": "gulp-generate-reexports",
+	"version": "0.0.0",
+	"description": "Generates an index module that re-exports all other files",
+	"main": "index.ts",
+	"types": "index.ts",
+	"author": "eth-p",
+	"license": "MIT",
+	"dependencies": {
+		"micromatch": "^4.0.5",
+		"vinyl": "^3.0.0"
+	},
+	"peerDependencies": {
+		"gulp-typescript": "*",
+		"typescript": "*"
+	},
+	"devDependencies": {
+		"@types/micromatch": "^4.0.2",
+		"@types/node": "^18.8.5",
+		"@types/vinyl": "^2.0.6"
+	}
+}

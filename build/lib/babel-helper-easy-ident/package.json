@@ -1,0 +1,17 @@
+{
+	"name": "babel-helper-easy-ident",
+	"version": "0.0.0",
+	"description": "A utility to quickly convert between identifiers syntax and identifier AST",
+	"main": "index.ts",
+	"types": "index.ts",
+	"author": "eth-p",
+	"license": "MIT",
+	"private": true,
+	"peerDependencies": {
+		"@babel/core": "*"
+	},
+	"devDependencies": {
+		"@types/babel-core": "^6.25.7",
+		"@types/babel-types": "^7.0.11"
+	}
+}
