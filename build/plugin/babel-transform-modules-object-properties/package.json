@@ -1,0 +1,22 @@
+{
+	"name": "babel-transform-modules-object-properties",
+	"version": "0.0.0",
+	"description": "Custom module transformer",
+	"main": "index.ts",
+	"types": "index.ts",
+	"author": "eth-p",
+	"license": "MIT",
+	"dependencies": {
+		"@babel/helper-plugin-utils": "^7.19.0",
+		"@babel/traverse": "^7.19.4",
+		"babel-helper-easy-ident": "file:../../lib/babel-helper-easy-ident"
+	},
+	"peerDependencies": {
+		"@babel/core": "*"
+	},
+	"devDependencies": {
+		"@types/babel-core": "^6.25.7",
+		"@types/babel-traverse": "^6.25.7",
+		"@types/babel-types": "^7.0.11"
+	}
+}

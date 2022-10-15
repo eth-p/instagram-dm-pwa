@@ -1,0 +1,21 @@
+{
+	"name": "babel-transform-rewrite-modules",
+	"version": "0.0.0",
+	"description": "Rewrite module names",
+	"main": "index.ts",
+	"types": "index.ts",
+	"author": "eth-p",
+	"license": "MIT",
+	"dependencies": {
+		"@babel/helper-plugin-utils": "^7.19.0",
+		"@babel/traverse": "^7.19.4"
+	},
+	"peerDependencies": {
+		"@babel/core": "*"
+	},
+	"devDependencies": {
+		"@types/babel-core": "^6.25.7",
+		"@types/babel-traverse": "^6.25.7",
+		"@types/babel-types": "^7.0.11"
+	}
+}

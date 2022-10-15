@@ -1,0 +1,24 @@
+{
+	"name": "gulp-typescript-shared",
+	"version": "0.0.0",
+	"description": "Shared TypeScript source for gulp",
+	"main": "index.ts",
+	"types": "index.ts",
+	"author": "eth-p",
+	"license": "MIT",
+	"dependencies": {
+		"fancy-log": "^2.0.0",
+		"micromatch": "^4.0.5"
+	},
+	"peerDependencies": {
+		"gulp-typescript": "*",
+		"typescript": "*",
+		"vinyl": "^3.0.0"
+	},
+	"devDependencies": {
+		"@types/fancy-log": "^2.0.0",
+		"@types/micromatch": "^4.0.2",
+		"@types/node": "^18.8.5",
+		"@types/vinyl": "^2.0.6"
+	}
+}

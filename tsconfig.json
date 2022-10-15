@@ -1,14 +1,14 @@
 {
-	"include": ["./src/**/*.ts", "src/feat/remove-nav-v1.tsx"],
-	"exclude": ["./src/bootstrap.ts"],
+	"include": ["src"],
 	"compilerOptions": {
 		"moduleResolution": "Node",
 		"module": "ESNext",
-		"sourceMap": false,
+		"sourceMap": true,
+		"inlineSourceMap": false,
 		"lib": ["DOM", "DOM.Iterable", "ES2021"],
 		"types": ["tampermonkey"],
 		"typeRoots": [
-			"./src/ig",
+			"./src/instagram"
 		],
 
 		// Hacky things needed

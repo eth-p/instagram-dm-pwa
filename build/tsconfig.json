@@ -1,0 +1,15 @@
+{
+	// THIS IS FOR THE BUILD SCRIPTS
+	// The TypeScript config for the project is located in the top-level folder.
+
+	"compilerOptions": {
+		"module": "CommonJS",
+		"typeRoots": ["./node_modules"],
+		"types": ["node"],
+
+		"esModuleInterop": true,
+
+		"target": "ES2017",
+		"noEmit": true,
+	}
+}
