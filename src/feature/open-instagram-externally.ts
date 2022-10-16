@@ -1,16 +1,17 @@
 // -----------------------------------------------------------------------------
-// Hook: open-instagram-externally
+// Feature: open-instagram-externally
 //
-// This hook patches the `FastLink` react prop (which is used for internal
+// This feature patches the `FastLink` react prop (which is used for internal
 // navigation) to open non-DM Instagram links in a new tab, preventing the page
 // from leaving the Instagram DM view.
 // -----------------------------------------------------------------------------
+
 import type { ComponentProps } from "react";
 
-import type * as FastLink from "IG_FastLink";
-import type * as browserHistory from "IG_browserHistory";
+import FastLink from "IG_FastLink";
 
-import { intercept, LoadManager, tryModules, tryReexport, wrap } from "../modules";
+import { intercept, reexport, wrap } from "../util/module";
+import { guardAsync } from "../util/guard";
 
 /**
  * Checks if a URL should open externally.
@@ -36,21 +37,20 @@ function tryOpenExternally(url: string): boolean {
 }
 
 
-const manager = new LoadManager("hide-instagram-nav");
-tryReexport<typeof FastLink>(manager, "FastLink", (old) => {
-	return (props: ComponentProps<typeof FastLink.default>) => {
+reexport(FastLink, (old) => {
+	return (props: ComponentProps<typeof FastLink>) => {
 		if (shouldOpenExternally(props.href)) {
 			props.target = "_blank";
 		}
 
-		return old.default({
+		return old({
 			...props,
 		});
 	};
 });
 
-tryModules<[typeof browserHistory]>
-(manager, ["browserHistory"], (browserHistory) => {
+guardAsync("browserHistory hook", async () => {
+	const browserHistory = await import("IG_browserHistory");
 
 	intercept(browserHistory, "redirect", (thisValue, original, args) => {
 		if (!tryOpenExternally(args[0])) {

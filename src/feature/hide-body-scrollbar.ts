@@ -1,9 +1,11 @@
 // -----------------------------------------------------------------------------
-// Hook: hide-body-scrollbar
+// Feature: hide-body-scrollbar
 //
-// This hook patches Instagram to hide the extraneous scollbar on the body.
+// This feature patches Instagram to hide the extraneous vertical scrollbar on
+// the page body.
 // -----------------------------------------------------------------------------
-import { stylesheet } from "../stylish";
+
+import { stylesheet } from "../util/css";
 
 stylesheet(`
 	body,

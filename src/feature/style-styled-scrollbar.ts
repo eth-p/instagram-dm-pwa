@@ -1,9 +1,10 @@
 // -----------------------------------------------------------------------------
-// Hook: style-styled-scrollbar
+// Feature: style-styled-scrollbar
 //
-// This hook adds styled scrollbars for WebKit browsers.
+// This feature adds styled scrollbars for WebKit browsers.
 // -----------------------------------------------------------------------------
-import { stylesheet } from "../stylish";
+
+import { stylesheet } from "../util/css";
 
 stylesheet(`
     ::-webkit-scrollbar {
