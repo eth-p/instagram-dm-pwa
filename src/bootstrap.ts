@@ -1,27 +1,15 @@
-import { PROJECT_NAME, logError, logInfo } from "./util/debug";
+import { PROJECT_NAME, OPENED_IN_PWA, logError, logInfo } from "./util/debug";
 import { require } from "./util/module";
 
-let isPWA = false;
-
-// Only act on the PWA.
-//
-// The PWA entrypoint is set to "/?utm_source=pwa_homescreen" for tracking reasons.
-// This is convenient, since we can use that differentiate between the Instagram website and PWA.
-// We set the window name so we can keep track of the page and know that it came from the PWA.
-
-if (unsafeWindow.location.pathname === "/" && window.location.search === "?utm_source=pwa_homescreen") {
-	isPWA = true;
+// Ensure that any redirects are treated as part of the PWA.
+if (OPENED_IN_PWA && unsafeWindow.name !== PROJECT_NAME) {
 	unsafeWindow.name = PROJECT_NAME;
-
-	// Redirect to the DM page if not already there.
-	if (!window.location.pathname.startsWith("/direct/")) {
-		unsafeWindow.history.replaceState({}, "", "/direct/t/?utm_source=pwa_homescreen");
-		unsafeWindow.location = "/direct/t/?utm_source=pwa_homescreen";
-	}
 }
 
-if (unsafeWindow.name === PROJECT_NAME) {
-	isPWA = true;
+// If we're not in the DM page already, navigate to it since this userscript creates a chat app.
+if (unsafeWindow.location.pathname === "/" && OPENED_IN_PWA) {
+	unsafeWindow.history.replaceState({}, "", "/direct/t/?utm_source=pwa_homescreen");
+	unsafeWindow.location = "/direct/t/?utm_source=pwa_homescreen";
 }
 
 /**
@@ -32,7 +20,7 @@ if (unsafeWindow.name === PROJECT_NAME) {
  * @param callback The callback function to run when the feature's dependencies are loaded.
  */
 function feature(name: string, dependencies: string[], callback: (...args: any[]) => Promise<unknown>) {
-	if (!isPWA) return;
+	if (!OPENED_IN_PWA) return;
 	const start = Date.now();
 
 	function showEnableMessage() {
