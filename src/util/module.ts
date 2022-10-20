@@ -1,6 +1,7 @@
 import type __debug from "__debug";
 
 import { logInfo } from "./debug";
+import { fallbackOnError } from "./guard";
 
 /**
  * The Window object of the Instagram website.
@@ -223,16 +224,23 @@ export function reexport<M>(module: M, factory: (exports: M) => any) {
 
 	// Get the original exports and rewrite them.
 	const originals = internals.exports;
-	const rewritten = factory(module);
-	internals.defaultExport = rewritten;
-	internals.exports = typeof rewritten === 'object' ? rewritten : {default: rewritten};
+	const generated = factory(module);
+	const rewritten = typeof generated === 'object' ? generated : {default: generated};
 
-	Reflect.set(internals.exports, ID_TAG, MODULE_ID);
-	Reflect.set(internals.defaultExport, ID_TAG, MODULE_ID);
+	// Update the functions to gracefully handle errors.
+	for (const exportName of Object.keys(rewritten)) {
+		const exportValue = rewritten[exportName];
+		const originalValue = originals[exportName];
+		if (typeof exportValue !== 'function' || typeof originalValue !== 'function') {
+			continue;
+		}
+
+		rewritten[exportName] = fallbackOnError(exportValue, originalValue);
+	}
 
 	// Update the names for debugging.
 	for (const exportName of Object.keys(internals.exports)) {
-		const exportValue = internals.exports[exportName];
+		const exportValue = rewritten[exportName];
 		if (typeof exportValue !== 'function') {
 			continue;
 		}
@@ -247,4 +255,11 @@ export function reexport<M>(module: M, factory: (exports: M) => any) {
 			(typeof original === 'function' ? original.displayName : original.name) +
 			" $ [intercepted]";
 	}
+
+	// Update the module exports.
+	internals.defaultExport = typeof generated === 'function' ? rewritten.default : generated;
+	internals.exports = rewritten;
+
+	Reflect.set(internals.exports, ID_TAG, MODULE_ID);
+	Reflect.set(internals.defaultExport, ID_TAG, MODULE_ID);
 }
