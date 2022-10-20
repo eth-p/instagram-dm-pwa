@@ -160,6 +160,25 @@ type FunctionsIn<T> = {
 };
 
 /**
+ * Updates the properties of a function to copy those of another function.
+ *
+ * @param from The functions whose properties are being copied.
+ * @param to The function that will receive the properties.
+ *
+ * @returns The function that receives the properties.
+ */
+function faked<F extends (...args: A) => R, A extends [], R>(from: F, to: F): F {
+	for (const [prop, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(from))) {
+		if (prop === 'name') continue;
+		if (prop === 'displayName') continue;
+		if (prop === 'length') continue;
+		Object.defineProperty(to, prop, descriptor);
+	}
+
+	return to;
+}
+
+/**
  * Wraps a function, allowing it to be hooked.
  *
  * @param func The original function.
@@ -174,9 +193,9 @@ export function wrap
 <T extends (...args: A) => R, A extends any[], R>
 (func: T, wrapper: (thisValue: ThisType<T>, original: T, args: Parameters<T>) => R): T {
 	const original = func;
-	return function(this: ThisType<T>, ...args: Parameters<T>): R {
+	return faked(original, function(this: ThisType<T>, ...args: Parameters<T>): R {
 		return wrapper(this, original, args);
-	} as T;
+	} as T);
 }
 
 /**
@@ -195,9 +214,12 @@ export function intercept
 <Module extends any, Prop extends keyof FunctionsIn<MF>, MF extends FunctionsIn<Module> = FunctionsIn<Module>>
 (module: Module, prop: Prop, wrapper: (thisValue: ThisType<MF[Prop]>, original: MF[Prop], args: Parameters<MF[Prop]>) => ReturnType<MF[Prop]>) {
 	const original = (module as unknown as MF)[prop];
-	(module as unknown as MF)[prop] = function(this: ThisType<MF[Prop]>, ...args: Parameters<MF[Prop]>): ReturnType<MF[Prop]> {
-		return wrapper(this, original as unknown as MF[Prop], args);
-	} as MF[Prop];
+	(module as unknown as MF)[prop] = faked(
+		original,
+		function(this: ThisType<MF[Prop]>, ...args: Parameters<MF[Prop]>): ReturnType<MF[Prop]> {
+			return wrapper(this, original, args);
+		} as MF[Prop]
+	);
 }
 
 /**
@@ -227,7 +249,7 @@ export function reexport<M>(module: M, factory: (exports: M) => any) {
 	const generated = factory(module);
 	const rewritten = typeof generated === 'object' ? generated : {default: generated};
 
-	// Update the functions to gracefully handle errors.
+	// Update the functions to correctly fake the originals and gracefully handle errors.
 	for (const exportName of Object.keys(rewritten)) {
 		const exportValue = rewritten[exportName];
 		const originalValue = originals[exportName];
@@ -235,7 +257,7 @@ export function reexport<M>(module: M, factory: (exports: M) => any) {
 			continue;
 		}
 
-		rewritten[exportName] = fallbackOnError(exportValue, originalValue);
+		rewritten[exportName] = faked(originalValue, fallbackOnError(exportValue, originalValue));
 	}
 
 	// Update the names for debugging.
